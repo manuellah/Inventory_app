@@ -3,7 +3,7 @@ class inventory(object):
         self.inventory = inventory
         
     def item_add(self):
-        pass
+        
     
     def item_remove(self):
         pass
