@@ -28,7 +28,7 @@ class Main(Cmd):
         inventory.item_add(item_name, item_description, item_quantity, cost_per_item)
     
     def do_remove(self, args):
-        item_id = raw_input(click.style("\n\t\tEnter Item Id : ", fg = 'yellow'))
+        item_id = raw_input(click.style("\n\tEnter Item Id : ", fg = 'yellow'))
         inventory.item_remove(item_id)
         
         

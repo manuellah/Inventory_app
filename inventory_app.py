@@ -20,11 +20,36 @@ class inventory(object):
         click.secho("\n\t\t\tSuccessfully Added", fg = 'green', bold = True) 
         
     def item_remove(self, item_id):
-        self.session.query(Asset.AssetId).filter(Asset.AssetId == item_id).delete()
+        display = "\n\tEnter The Quantity To Remove or D to Delete The Entire Row : "
+        action = raw_input(click.style(display , fg = 'yellow'))
+        query = (self.session.query(Asset)
+                  .filter(Asset.AssetId==item_id)).first()
         self.session.commit()
         
-        click.secho("\n\t\t\tSuccessfully Removed", fg = 'green', bold = True) 
-        
+        if query is None:
+            click.secho("\n\t\t\t No Such Item", fg = 'red', bold = True) 
+            
+        elif action.upper() == 'D':
+            self.session.query(Asset.AssetId).filter(Asset.AssetId ==   item_id).delete()
+            self.session.commit()
+            print 'manuh'
+            click.secho("\n\t\t\tSuccessfully Removed", fg = 'green', bold = True) 
+            
+        elif isinstance(float(action), float):
+            deduct = float(action)
+            current_quantity = query.Item_amount_available
+            if deduct <= 0 :
+                click.secho("\n\t\t\tCan Not Update negative or Zero Quantity", fg = 'red', bold = True)
+            elif deduct > current_quantity:
+                click.secho("\n\t\t\tQuantity Entered Is Greater Than Available Quantity", fg = 'red', bold = True)
+            else:
+                query1 = (self.session.query(Asset)
+                  .filter(Asset.AssetId==item_id))
+                new_bal = current_quantity - deduct
+                format_str = "\n\t\t\tSuccessfully Update. New Balance   {}".format(new_bal)
+                query1.update({'Item_amount_available': new_bal})
+                click.secho(format_str, fg = 'green', bold = True)
+
     def item_list(self):
         mydata = []
         rs = self.session.query(Asset).all()
@@ -37,32 +62,44 @@ class inventory(object):
         return mydata
  
     def item_check_out(self, item_id):
-        the_date = datetime.now().strftime('%Y-%m-%d %H:%M')
-        self.session.add(log(the_date, None, item_id))
+        query = (self.session.query(Asset)
+                  .filter(Asset.AssetId==item_id)).first()
+        if query is None:
+            click.secho("\n\t\t\t No Such Item", fg = 'green', bold = True) 
+        elif query.Item_status:
+            the_date = datetime.now().strftime('%Y-%m-%d %H:%M')
+            self.session.add(log(the_date, None, item_id))
 
-        my_item = (self.session.query(Asset)
-        .filter(Asset.AssetId==item_id)
-        .update({'Item_status': False}))
-        self.session.commit()
-        
-        click.secho("\n\t\t\t Checked Out Successfully", fg = 'green', bold = True) 
-        
+            my_item = (self.session.query(Asset)
+            .filter(Asset.AssetId==item_id)
+            .update({'Item_status': False}))
+            self.session.commit()
+
+            click.secho("\n\t\t\t Checked Out Successfully", fg = 'green', bold = True) 
+        else:
+            click.secho("\n\t\t\t The Item Is Currently Checked Out", fg = 'green', bold = True) 
     def item_check_in(self, item_id):
-        my_item = (self.session.query(log)
-        .filter(log.AssetId==item_id)
-        .update({'Check_in_date': datetime.now().strftime('%Y-%m-%d %H:%M')}))
-        
-        (self.session.query(Asset)
-        .filter(Asset.AssetId==item_id)
-        .update({'Item_status': True}))
-        self.session.commit()
-        self.session.commit()
-        
-        click.secho("\n\t\t\t Checked In Successfully", fg = 'green', bold = True) 
-    
+        query = (self.session.query(Asset)
+                  .filter(Asset.AssetId==item_id)).first()
+        if query is None:
+            click.secho("\n\t\t\t No Such Item", fg = 'green', bold = True) 
+        elif not query.Item_status:
+            my_item = (self.session.query(log)
+            .filter(log.AssetId==item_id)
+            .update({'Check_in_date': datetime.now().strftime('%Y-%m-%d %H:%M')}))
+
+            (self.session.query(Asset)
+            .filter(Asset.AssetId==item_id)
+            .update({'Item_status': True}))
+            self.session.commit()
+
+            click.secho("\n\t\t\t Checked In Successfully", fg = 'green', bold = True) 
+            
+        else:
+            click.secho("\n\t\t\t The Item Is Not Checked Out", fg = 'green', bold = True) 
     def item_view(self, item_id):
         rs = (self.session.query(Asset)
-        .filter(Asset.AssetId==item_id).one())
+        .filter(Asset.AssetId==item_id).first())
         self.session.commit()
         logs = []
         for log in rs.logs:
