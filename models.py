@@ -23,7 +23,7 @@ class Asset(Base):
 
     logs = relationship("log")
 
-    def __init__(self, Item_name, Item_description, Item_amount_available,
+    def __init__(self, Item_name,  Item_amount_available,
                  Cost_per_item, Item_date_added, Item_status):
         
         self.Item_name = Item_name

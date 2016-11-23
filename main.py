@@ -9,7 +9,7 @@ inventory = inventory()
 
 class Main(Cmd):
     intro = click.style('\t============ WELCOME =============\n', fg = 'red', bold = True)
-    doc_header = 'doc_header'
+    doc_header = click.style('', fg = 'green', bold = True)
     misc_header = 'misc_header'
     undoc_header = 'undoc_header'
     ruler = click.style('-', fg = 'yellow')
@@ -30,7 +30,49 @@ class Main(Cmd):
     def do_remove(self, args):
         item_id = raw_input(click.style("\n\t\tEnter Item Id : ", fg = 'yellow'))
         inventory.item_remove(item_id)
-    
+        
+        
+    def do_list_all(self, args):
+        all_data = inventory.item_list() 
+        click.secho('\n\t\t\t  List Of All The Assets\n', fg = 'yellow', bold = True, underline = True)
+        headers = ['Id', 'Name', 'Quantity', 'Cost Per Item', 'Date added', 'Ckecked Status']
+        click.secho(tabulate(all_data, tablefmt='fancy_grid', headers = headers), fg = 'yellow')
+        
+    def do_checkout(self, args):
+        item_id = raw_input(click.style("\n\t\tEnter Item Id : ", fg = 'yellow'))
+        inventory.item_check_out(item_id)
+        
+    def do_checkin(self, args):
+        item_id = raw_input(click.style("\n\t\tEnter Item Id : ", fg = 'yellow'))
+        inventory.item_check_in(item_id)
+        
+    def do_view_item(self, args):
+        item_id = raw_input(click.style("\n\t\tEnter Item Id : ", fg = 'yellow'))
+        item_data = inventory.item_view(item_id)
+        item_data = [click.style(str(item).ljust(30), fg = 'yellow') 
+                     for item in item_data]
+        print '\n\tItem Id :'.ljust(30) + item_data[0]
+        print '\tItem Name :'.ljust(30) + item_data[1]
+        print '\tItem Description :'.ljust(30) + item_data[2]
+        print '\tAvailable Quantity :'.ljust(30) + item_data[3]
+        print '\tCost Per Item :'.ljust(30) + item_data[4]
+        print '\tDate Bought :'.ljust(30) + item_data[5]
+        print '\tChecked Status :'.ljust(30) + item_data[6]
+        
+    def do_asset_value(self, args):
+        tot_assets_value = inventory.assetvalue()
+        format_str = '\n\t\t The Total Assets Value\n'
+        val = '\t\t\t  {}\n'.format(tot_assets_value)
+        eq = '=' * 50
+        click.secho('\n\n\t' + eq + '\n', fg = 'cyan', bold = True)
+        click.secho(format_str, fg = 'yellow', bold = True)
+        click.secho(val, fg = 'yellow', bold = True)
+        click.secho('\n\t' + eq + '\n', fg = 'cyan', bold = True)
+        
+    def do_search(self, args):
+        results = inventory.item_search()
+        headers = ['Id', 'Name', 'Quantity', 'Cost Per Item', 'Date added', 'Ckecked Status']
+        click.secho(tabulate(results, tablefmt='fancy_grid', headers = headers), fg = 'yellow')
     def do_quit(self, args):
         return True
     
