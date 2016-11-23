@@ -1,18 +1,14 @@
 from models import  Asset, log, Session
 from datetime import datetime
+import click
 
 class inventory(object):
-    def __init__(self, inventory):
+    def __init__(self, inventory = "my_inventory"):
         self.inventory = inventory
         self.ses = Session()
         
-    def item_add(self):
-        print "\t\t\tItem Details"
+    def item_add(self, item_name, item_description, item_quantity, cost_per_item):
         
-        item_name = raw_input("\t\tName : ")
-        item_description = raw_input('\t\tDescription : ')
-        item_quantity = raw_input('\t\tQuantity : ')
-        cost_per_item = raw_input("\t\tCost Per Item : ")
         date_added = datetime.utcnow()
         item_status = True
         
@@ -20,7 +16,7 @@ class inventory(object):
                     cost_per_item, date_added,  item_status))
         self.ses.commit()
         
-        print "\t\t\tSuccessfully Added"
+        click.secho("\n\t\t\tSuccessfully Added", fg = 'green', bold = True) 
         
     def item_remove(self, item_id):
         self.ses.query(Asset.AssetId).filter(Asset.AssetId == item_id).delete()
@@ -41,19 +37,43 @@ class inventory(object):
     def item_check_out(self, item_id):
         self.ses.add(log(datetime.utcnow(), None, item_id))
         self.ses.commit()
+        
     def item_check_in(self, item_id):
-        the_item = self.ses.query( log.Check_in_date).filter_by(log.AssetId==item_id).update()
-        the_item.Check_in_date = datetime.utcnow()
+        my_item = (self.ses.query(log)
+        .filter(log.AssetId==item_id)
+        .update({'Check_in_date': datetime.utcnow()}))
         self.ses.commit()
+        print "Checked in"
     
-    def item_view(self):
-        pass
-    
+    def item_view(self, item_id):
+        rs = (self.ses.query(Asset)
+        .filter(Asset.AssetId==item_id)
+        .one())
+        self.ses.commit()
+        
+        for log in rs.logs:
+            print log.LogId ,log.Check_out_date, log.Check_in_date
+            
+        print [rs.AssetId, rs.Item_name, rs.Item_description, rs.Item_amount_available,
+        rs.Cost_per_item, rs.Date_added, rs.Item_status]
+        
     def assetvalue(self):
-        pass
+        total_value = 0
+        rs = self.ses.query(Asset.Cost_per_item, Asset.Item_amount_available).all()
+        for item in rs:
+            total_value= item.Cost_per_item * item.Item_amount_available + total_value
+        return total_value
     
-    def item_search(self, item):
-        pass
+    def item_search(self):
+        result_list = []
+        search_data = raw_input("Enter Your search request : ")
+        search_pattern = '%{}%'.format(search_data)
+        rs = (self.ses.query(Asset).filter(Asset.Item_description.like(search_pattern)).all())
+        for data in rs:
+            result_list.append([data.AssetId, data.Item_name, data.Item_description,
+            data.Item_amount_available, data.Cost_per_item, data.Date_added, data.Item_status])
+            
+        return result_list
     
     def update_log(self, item_id):
         ads=Asset('Manu','Bootcamp process', 400, 500,100, datetime.utcnow(), True)
@@ -64,6 +84,6 @@ class inventory(object):
 
         
 asd = inventory('my inventory')
-asd.item_check_in(1)
+print asd.assetvalue()
 
     
