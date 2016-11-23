@@ -39,6 +39,10 @@ class inventory(object):
     def item_check_out(self, item_id):
         the_date = datetime.now().strftime('%Y-%m-%d %H:%M')
         self.session.add(log(the_date, None, item_id))
+
+        my_item = (self.session.query(Asset)
+        .filter(Asset.AssetId==item_id)
+        .update({'Item_status': False}))
         self.session.commit()
         
         click.secho("\n\t\t\t Checked Out Successfully", fg = 'green', bold = True) 
@@ -47,6 +51,11 @@ class inventory(object):
         my_item = (self.session.query(log)
         .filter(log.AssetId==item_id)
         .update({'Check_in_date': datetime.now().strftime('%Y-%m-%d %H:%M')}))
+        
+        (self.session.query(Asset)
+        .filter(Asset.AssetId==item_id)
+        .update({'Item_status': True}))
+        self.session.commit()
         self.session.commit()
         
         click.secho("\n\t\t\t Checked In Successfully", fg = 'green', bold = True) 

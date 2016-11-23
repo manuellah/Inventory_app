@@ -35,7 +35,7 @@ class Main(Cmd):
     def do_list_all(self, args):
         all_data = inventory.item_list() 
         click.secho('\n\t\t\t  List Of All The Assets\n', fg = 'yellow', bold = True, underline = True)
-        headers = ['Id', 'Name', 'Quantity', 'Cost Per Item', 'Date added', 'Ckecked Status']
+        headers = ['Id', 'Name', 'Quantity', 'Cost Per Item', 'Date added', 'Checked Status']
         click.secho(tabulate(all_data, tablefmt='fancy_grid', headers = headers), fg = 'yellow')
         
     def do_checkout(self, args):
