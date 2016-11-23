@@ -18,12 +18,12 @@ class Asset(Base):
     Item_description = Column(String)
     Item_amount_available = Column(Integer)
     Cost_per_item = Column(Float)
-    Date_added = Column(DateTime)
+    Date_added = Column(String)
     Item_status = Column(Boolean)
 
     logs = relationship("log")
 
-    def __init__(self, Item_name,  Item_amount_available,
+    def __init__(self, Item_name, Item_description, Item_amount_available,
                  Cost_per_item, Item_date_added, Item_status):
         
         self.Item_name = Item_name
@@ -37,8 +37,8 @@ class log(Base):
     __tablename__ = "logs"
  
     LogId = Column(Integer, primary_key=True)
-    Check_out_date = Column(DateTime)   
-    Check_in_date = Column(DateTime)    
+    Check_out_date = Column(String)   
+    Check_in_date = Column(String)    
     AssetId = Column(Integer, ForeignKey("Assets.AssetId"))    
                            
     Assets = relationship("Asset")   

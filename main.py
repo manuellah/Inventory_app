@@ -10,8 +10,8 @@ inventory = inventory()
 class Main(Cmd):
     intro = click.style('\t============ WELCOME =============\n', fg = 'red', bold = True)
     doc_header = click.style('', fg = 'green', bold = True)
-    misc_header = 'misc_header'
-    undoc_header = 'undoc_header'
+    misc_header = 'Main Commands'
+    undoc_header = 'Other Commands'
     ruler = click.style('-', fg = 'yellow')
     
     prompt = click.style("\n  Inventory Prompt >>> ", fg = 'cyan', bold = True)
@@ -48,17 +48,21 @@ class Main(Cmd):
         
     def do_view_item(self, args):
         item_id = raw_input(click.style("\n\t\tEnter Item Id : ", fg = 'yellow'))
-        item_data = inventory.item_view(item_id)
+        item_data_cons = inventory.item_view(item_id)
         item_data = [click.style(str(item).ljust(30), fg = 'yellow') 
-                     for item in item_data]
-        print '\n\tItem Id :'.ljust(30) + item_data[0]
+                     for item in item_data_cons]
+        print '\n\tItem Id :'.ljust(31) + item_data[0]
         print '\tItem Name :'.ljust(30) + item_data[1]
         print '\tItem Description :'.ljust(30) + item_data[2]
         print '\tAvailable Quantity :'.ljust(30) + item_data[3]
         print '\tCost Per Item :'.ljust(30) + item_data[4]
         print '\tDate Bought :'.ljust(30) + item_data[5]
         print '\tChecked Status :'.ljust(30) + item_data[6]
-        
+        logs_data = item_data_cons[7]
+        headers = ['Log Id','Check Out Date','Check In Date']
+        format_str = '\n\t\t The check in/out log\n'
+        click.secho(format_str, fg = 'yellow', bold = True)
+        click.secho(tabulate(logs_data, tablefmt='fancy_grid', headers = headers), fg = 'yellow')
     def do_asset_value(self, args):
         tot_assets_value = inventory.assetvalue()
         format_str = '\n\t\t The Total Assets Value\n'
