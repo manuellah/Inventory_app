@@ -211,6 +211,7 @@ class Main(Cmd):
         To exit the application
         syntax : quit
         '''
+        print '\n\n'
         return True
     
     def do_exit(self, args):
@@ -218,6 +219,7 @@ class Main(Cmd):
         To exit the application
         syntax : exit
         '''
+        print '\n\n'
         return True
     
     def do_clear(selff, args):
