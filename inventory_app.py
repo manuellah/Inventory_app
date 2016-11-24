@@ -22,6 +22,16 @@ class Inventory(object):
     def item_remove(self, item_id):
         display = "\n\tEnter The Quantity To Remove or D to Delete The Entire Row : "
         action = raw_input(click.style(display , fg = 'yellow'))
+
+        if action.upper() == 'D':
+            pass
+        elif action.isdigit():
+            pass
+        else:
+            print action.upper()
+            click.secho("\n\t\t\t Invalid Quantity Value (Either D or Number)", fg = 'red', bold = True)
+            return
+                
         query = (self.session.query(Asset)
                   .filter(Asset.assetId==item_id)).first()
         self.session.commit()
@@ -121,7 +131,7 @@ class Inventory(object):
     
     def item_search(self):
         result_list = []
-        search_data = raw_input(click.style("\n\t\tEnter Your search request : ", fg = 'yellow'))
+        search_data = raw_input(click.style("\n\t\tEnter Your Search Request : ", fg = 'yellow'))
         search_pattern = '%{}%'.format(search_data)
         rs = (self.session.query(Asset)
               .filter(Asset.item_description.like(search_pattern)).all())
