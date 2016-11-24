@@ -242,7 +242,7 @@ class Main(Cmd):
         '''
         click.secho("\n\t\tInventory Application's Command", fg = 'blue', bold = True, underline = True)
         commands = '''
-        \t1. add item : add <item_name> <quantity> <cost_per_item> or add
+        1. add item : add <item_name> <quantity> <cost_per_item> or add
         \n\t2. remove item: remove <item_id> or remove
         \n\t3. view database: list_all --export <filename> or list_all
         \n\t4. check out item : checkout <number> or checkout
