@@ -8,6 +8,11 @@ app_name = click.style(figlet_format('Inventory', font='big'),fg='red',bold=True
 inventory = Inventory()
 
 class Main(Cmd):
+    '''
+    This class is the one responsible for the application UI(View). 
+    Interacts with the user and supplies inputs to the controller class(inventory_app)
+    '''
+    
     intro = click.style('\t============ WELCOME =============\n', fg = 'red', bold = True)
     doc_header = click.style('\tMain Commands', fg = 'green', bold = True)
     misc_header = click.style('\tMain Commands', fg = 'green', bold = True)
@@ -237,9 +242,9 @@ class Main(Cmd):
     
     def default(self, args):
         '''
-        Inventory Application Commands
-        
+        Displays all the applications commands when invalid command is given
         '''
+        
         click.secho("\n\t\tInventory Application's Command", fg = 'blue', bold = True, underline = True)
         commands = '''
         1. add item : add <item_name> <quantity> <cost_per_item> or add

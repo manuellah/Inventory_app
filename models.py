@@ -11,6 +11,11 @@ Session = sessionmaker(bind=eng)
 
 
 class Asset(Base):
+    '''
+    This class creates Assets table which holds data for our items.
+    Has a one to many relationship with the Logs table
+    '''
+    
     __tablename__ = "Assets"
  
     assetId = Column(Integer, primary_key=True)
@@ -34,6 +39,10 @@ class Asset(Base):
         self.item_status = item_status
 
 class Log(Base):
+    '''
+    This class creates logss table which tracks the check in, check out of an item.
+    
+    '''
     __tablename__ = "Logs"
  
     logId = Column(Integer, primary_key=True)
@@ -49,10 +58,3 @@ class Log(Base):
         self.check_in_date =  check_in_date
             
 Base.metadata.create_all() 
-
-#ads=Asset('Manu','Bootcamp process', 400, 500,100, datetime.utcnow(), True)
-#ads = log(datetime.utcnow(), datetime.utcnow(), 1)
-#ses.add(ads)
-
-#ses= Session()
-#print ses.query(Asset.Item_name, Asset.Item_description).all()

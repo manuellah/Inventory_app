@@ -3,12 +3,28 @@ from datetime import datetime
 import click, csv
 
 class Inventory(object):
+    '''
+    This is the controller class. Is the class which interact with
+    the database to query, update and delete data
+    '''
     def __init__(self, inventory = "my_inventory"):
         self.inventory = inventory
         self.session = Session()
         
     def item_add(self, item_name, item_description, item_quantity,
                  cost_per_item):
+        '''
+        This method add an item to the database
+        It also makes sure that same item cannot be added twice
+        '''
+        query = self.session.query(Asset.item_name, Asset.item_description).all()
+        
+        current_item = (item_name, item_description)
+        available_items = [(item.item_name, item.item_description) for item in query]
+        if current_item in available_items:
+            click.secho("\n\t\t\tSuch an item already exist in the database", 
+                        fg = 'red', bold = True)
+            return
         
         date_added = datetime.now().strftime('%Y-%m-%d %H:%M')
         item_status = True
@@ -29,7 +45,8 @@ class Inventory(object):
             pass
         else:
             print action.upper()
-            click.secho("\n\t\t\t Invalid Quantity Value (Either D or Number)", fg = 'red', bold = True)
+            click.secho("\n\t\t\t Invalid Quantity Value (Either D or Number)",
+                        fg = 'red', bold = True)
             return
                 
         query = (self.session.query(Asset)
@@ -40,7 +57,7 @@ class Inventory(object):
             click.secho("\n\t\t\t No Such Item", fg = 'red', bold = True) 
             
         elif action.upper() == 'D':
-            self.session.query(Asset.assetId).filter(Asset.assetId ==   item_id).delete()
+            self.session.query(Asset.assetId).filter(Asset.assetId == item_id).delete()
             self.session.commit()
             click.secho("\n\t\t\tSuccessfully Removed", fg = 'green', bold = True) 
             
@@ -48,9 +65,11 @@ class Inventory(object):
             deduct = float(action)
             current_quantity = query.item_amount_available
             if deduct <= 0 :
-                click.secho("\n\t\t\tCan Not Update negative or Zero Quantity", fg = 'red', bold = True)
+                click.secho("\n\t\t\tCan Not Update negative or Zero Quantity",
+                            fg = 'red', bold = True)
             elif deduct > current_quantity:
-                click.secho("\n\t\t\tQuantity Entered Is Greater Than Available Quantity", fg = 'red', bold = True)
+                click.secho("\n\t\t\tQuantity Entered Is Greater Than Available Quantity",
+                            fg = 'red', bold = True)
             else:
                 query1 = (self.session.query(Asset)
                   .filter(Asset.assetId==item_id))
@@ -84,9 +103,11 @@ class Inventory(object):
             .update({'item_status': False}))
             self.session.commit()
 
-            click.secho("\n\t\t\t Checked Out Successfully", fg = 'green', bold = True) 
+            click.secho("\n\t\t\t Checked Out Successfully",
+                        fg = 'green', bold = True) 
         else:
-            click.secho("\n\t\t\t The Item Is Currently Checked Out", fg = 'green', bold = True) 
+            click.secho("\n\t\t\t The Item Is Currently Checked Out", 
+                        fg = 'green', bold = True) 
     def item_check_in(self, item_id):
         query = (self.session.query(Asset)
                   .filter(Asset.assetId==item_id)).first()
@@ -102,10 +123,12 @@ class Inventory(object):
             .update({'item_status': True}))
             self.session.commit()
 
-            click.secho("\n\t\t\t Checked In Successfully", fg = 'green', bold = True) 
+            click.secho("\n\t\t\t Checked In Successfully",
+                        fg = 'green', bold = True) 
             
         else:
-            click.secho("\n\t\t\t The Item Is Not Checked Out", fg = 'green', bold = True) 
+            click.secho("\n\t\t\t The Item Is Not Checked Out",
+                        fg = 'green', bold = True) 
     def item_view(self, item_id):
         rs = (self.session.query(Asset)
         .filter(Asset.assetId==item_id).first())
@@ -149,14 +172,15 @@ class Inventory(object):
         rs = self.session.query(Asset).all()
         self.session.commit()
         for item in rs:
-            mydata.append([item.assetId, item.item_name, item.item_description, item.item_amount_available,
-            item.cost_per_item, item.date_added,
-            item.item_status])
+            mydata.append([item.assetId, item.item_name, item.item_description, 
+                item.item_amount_available,item.cost_per_item, item.date_added,
+                item.item_status])
             
         
         with open(filename + '.csv', 'w') as f:
             writer = csv.writer(f)
-            writer.writerow(['id', 'item-name','description', 'amount_available', 'price', 'date_added', 'status'])
+            writer.writerow(['id', 'item-name','description', 'amount_available', 
+                             'price', 'date_added', 'status'])
             writer.writerows(mydata)
         
         format_string = '\n\t\t\t{}  Successfully Created\n'.format(filename + '.csv')
