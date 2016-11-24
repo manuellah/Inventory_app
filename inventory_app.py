@@ -36,6 +36,10 @@ class Inventory(object):
         click.secho("\n\t\t\tSuccessfully Added", fg = 'green', bold = True) 
         
     def item_remove(self, item_id):
+        '''
+        This method delete an item from the data base. It also update the quantity
+        if given a valid value
+        '''
         display = "\n\tEnter The Quantity To Remove or D to Delete The Entire Row : "
         action = raw_input(click.style(display , fg = 'yellow'))
 
@@ -79,6 +83,10 @@ class Inventory(object):
                 click.secho(format_str, fg = 'green', bold = True)
 
     def item_list(self):
+        '''
+        The method querys the database and returns a list of list,
+        each inner list holding the values of each row(entry)
+        '''
         mydata = []
         rs = self.session.query(Asset).all()
         self.session.commit()
@@ -90,6 +98,10 @@ class Inventory(object):
         return mydata
  
     def item_check_out(self, item_id):
+        '''
+        This method checks out an it whose status value is False. This meaning
+        that the item is currently in the warehouse
+        '''
         query = (self.session.query(Asset)
                   .filter(Asset.assetId==item_id)).first()
         if query is None:
@@ -108,7 +120,11 @@ class Inventory(object):
         else:
             click.secho("\n\t\t\t The Item Is Currently Checked Out", 
                         fg = 'green', bold = True) 
+            
     def item_check_in(self, item_id):
+        '''
+        This method checks in items which where previously check out.
+        '''
         query = (self.session.query(Asset)
                   .filter(Asset.assetId==item_id)).first()
         if query is None:
@@ -130,6 +146,10 @@ class Inventory(object):
             click.secho("\n\t\t\t The Item Is Not Checked Out",
                         fg = 'green', bold = True) 
     def item_view(self, item_id):
+        '''
+        Recieves item_id as an argument and displays all the information of that particular
+        Item including the check in, check out log data
+        '''
         rs = (self.session.query(Asset)
         .filter(Asset.assetId==item_id).first())
         self.session.commit()
@@ -146,6 +166,10 @@ class Inventory(object):
                 rs.date_added, rs.item_status, logs]
         
     def assetvalue(self):
+        '''
+        This method computes the total value of all assets by summing up the 
+        total value of each item
+        '''
         total_value = 0
         rs = self.session.query(Asset.cost_per_item, Asset.item_amount_available).all()
         for item in rs:
@@ -153,6 +177,10 @@ class Inventory(object):
         return total_value
     
     def item_search(self, search_data):
+        '''
+        Searches for a particular search query from the database
+        and returns all items that matches the search query
+        '''
         result_list = []
         search_pattern = '%{}%'.format(search_data)
         rs = (self.session.query(Asset)
@@ -166,7 +194,7 @@ class Inventory(object):
     
     def db_state(self, filename = 'database'):
         '''
-        Exports the current state of the database
+        Exports the current state of the database to a csv file
         '''
         mydata = []
         rs = self.session.query(Asset).all()
