@@ -1,17 +1,17 @@
-import click
+import click, csv
 from tabulate import tabulate
 from pyfiglet import figlet_format
 from cmd import Cmd
-from inventory_app import inventory
+from inventory_app import Inventory
 
 app_name = click.style(figlet_format('Inventory', font='big'),fg='red',bold=True)
-inventory = inventory()
+inventory = Inventory()
 
 class Main(Cmd):
     intro = click.style('\t============ WELCOME =============\n', fg = 'red', bold = True)
-    doc_header = click.style('', fg = 'green', bold = True)
-    misc_header = 'Main Commands'
-    undoc_header = 'Other Commands'
+    doc_header = click.style('\tMain Commands', fg = 'green', bold = True)
+    misc_header = click.style('\tMain Commands', fg = 'green', bold = True)
+    undoc_header = click.style('\tOther Commands', fg = 'green', bold = True)
     ruler = click.style('-', fg = 'yellow')
     
     prompt = click.style("\n  Inventory Prompt >>> ", fg = 'cyan', bold = True)
@@ -33,11 +33,27 @@ class Main(Cmd):
         
         
     def do_list_all(self, args):
-        all_data = inventory.item_list() 
-        click.secho('\n\t\t\t  List Of All The Assets\n', fg = 'yellow', bold = True, underline = True)
-        headers = ['Id', 'Name', 'Quantity', 'Cost Per Item', 'Date added', 'Checked Status']
-        click.secho(tabulate(all_data, tablefmt='fancy_grid', headers = headers), fg = 'yellow')
+        if not args:
+            all_data = inventory.item_list() 
+            click.secho('\n\t\t\t  List Of All The Assets\n', fg = 'yellow', bold = True, underline = True)
+            headers = ['Id', 'Name', 'Quantity', 'Cost Per Item', 'Date added', 'Checked Status']
+            click.secho(tabulate(all_data, tablefmt='fancy_grid', headers = headers), fg = 'yellow')
+            
+            return
         
+        args = args.split()
+        if args[0] == '--export':
+            all_data = inventory.item_list() 
+            click.secho('\n\t\t\t  List Of All The Assets\n', fg = 'yellow', bold = True, underline = True)
+            headers = ['Id', 'Name', 'Quantity', 'Cost Per Item', 'Date added', 'Checked Status']
+            click.secho(tabulate(all_data, tablefmt='fancy_grid', headers = headers), fg = 'yellow')
+            
+            inventory.db_state(args[1] ) 
+            
+        else:
+            click.secho("\n\t\tIncorrect Syntax \n\n\tCorrect syntax : list_all --export <filename> ", fg = 'yellow')
+
+
     def do_checkout(self, args):
         item_id = raw_input(click.style("\n\t\tEnter Item Id : ", fg = 'yellow'))
         inventory.item_check_out(item_id)
@@ -49,6 +65,9 @@ class Main(Cmd):
     def do_view_item(self, args):
         item_id = raw_input(click.style("\n\t\tEnter Item Id : ", fg = 'yellow'))
         item_data_cons = inventory.item_view(item_id)
+        if not item_data_cons:
+            click.secho("\n\t\t\t No Such Item", fg = 'green', bold = True)
+            return
         item_data = [click.style(str(item).ljust(30), fg = 'yellow') 
                      for item in item_data_cons]
         print '\n\tItem Id :'.ljust(31) + item_data[0]
@@ -63,6 +82,7 @@ class Main(Cmd):
         format_str = '\n\t\t The check in/out log\n'
         click.secho(format_str, fg = 'yellow', bold = True)
         click.secho(tabulate(logs_data, tablefmt='fancy_grid', headers = headers), fg = 'yellow')
+        
     def do_asset_value(self, args):
         tot_assets_value = inventory.assetvalue()
         format_str = '\n\t\t The Total Assets Value\n'
@@ -75,7 +95,7 @@ class Main(Cmd):
         
     def do_search(self, args):
         results = inventory.item_search()
-        headers = ['Id', 'Name', 'Quantity', 'Cost Per Item', 'Date added', 'Ckecked Status']
+        headers = ['Id', 'Name', 'Quantity', 'Cost Per Item', 'Date added', 'Checked Status']
         click.secho(tabulate(results, tablefmt='fancy_grid', headers = headers), fg = 'yellow')
     def do_quit(self, args):
         return True

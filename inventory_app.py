@@ -1,8 +1,8 @@
-from models import  Asset, log, Session
+from models import  Asset, Log, Session
 from datetime import datetime
-import click
+import click, csv
 
-class inventory(object):
+class Inventory(object):
     def __init__(self, inventory = "my_inventory"):
         self.inventory = inventory
         self.session = Session()
@@ -23,31 +23,30 @@ class inventory(object):
         display = "\n\tEnter The Quantity To Remove or D to Delete The Entire Row : "
         action = raw_input(click.style(display , fg = 'yellow'))
         query = (self.session.query(Asset)
-                  .filter(Asset.AssetId==item_id)).first()
+                  .filter(Asset.assetId==item_id)).first()
         self.session.commit()
         
         if query is None:
             click.secho("\n\t\t\t No Such Item", fg = 'red', bold = True) 
             
         elif action.upper() == 'D':
-            self.session.query(Asset.AssetId).filter(Asset.AssetId ==   item_id).delete()
+            self.session.query(Asset.assetId).filter(Asset.assetId ==   item_id).delete()
             self.session.commit()
-            print 'manuh'
             click.secho("\n\t\t\tSuccessfully Removed", fg = 'green', bold = True) 
             
         elif isinstance(float(action), float):
             deduct = float(action)
-            current_quantity = query.Item_amount_available
+            current_quantity = query.item_amount_available
             if deduct <= 0 :
                 click.secho("\n\t\t\tCan Not Update negative or Zero Quantity", fg = 'red', bold = True)
             elif deduct > current_quantity:
                 click.secho("\n\t\t\tQuantity Entered Is Greater Than Available Quantity", fg = 'red', bold = True)
             else:
                 query1 = (self.session.query(Asset)
-                  .filter(Asset.AssetId==item_id))
+                  .filter(Asset.assetId==item_id))
                 new_bal = current_quantity - deduct
                 format_str = "\n\t\t\tSuccessfully Update. New Balance   {}".format(new_bal)
-                query1.update({'Item_amount_available': new_bal})
+                query1.update({'item_amount_available': new_bal})
                 click.secho(format_str, fg = 'green', bold = True)
 
     def item_list(self):
@@ -55,24 +54,24 @@ class inventory(object):
         rs = self.session.query(Asset).all()
         self.session.commit()
         for item in rs:
-            mydata.append([item.AssetId, item.Item_name,
-             item.Item_amount_available, item.Cost_per_item, item.Date_added,
-             item.Item_status])
+            mydata.append([item.assetId, item.item_name,
+             item.item_amount_available, item.cost_per_item, item.date_added,
+             item.item_status])
             
         return mydata
  
     def item_check_out(self, item_id):
         query = (self.session.query(Asset)
-                  .filter(Asset.AssetId==item_id)).first()
+                  .filter(Asset.assetId==item_id)).first()
         if query is None:
             click.secho("\n\t\t\t No Such Item", fg = 'green', bold = True) 
-        elif query.Item_status:
+        elif query.item_status:
             the_date = datetime.now().strftime('%Y-%m-%d %H:%M')
-            self.session.add(log(the_date, None, item_id))
+            self.session.add(Log(the_date, None, item_id))
 
             my_item = (self.session.query(Asset)
-            .filter(Asset.AssetId==item_id)
-            .update({'Item_status': False}))
+            .filter(Asset.assetId==item_id)
+            .update({'item_status': False}))
             self.session.commit()
 
             click.secho("\n\t\t\t Checked Out Successfully", fg = 'green', bold = True) 
@@ -80,17 +79,17 @@ class inventory(object):
             click.secho("\n\t\t\t The Item Is Currently Checked Out", fg = 'green', bold = True) 
     def item_check_in(self, item_id):
         query = (self.session.query(Asset)
-                  .filter(Asset.AssetId==item_id)).first()
+                  .filter(Asset.assetId==item_id)).first()
         if query is None:
             click.secho("\n\t\t\t No Such Item", fg = 'green', bold = True) 
-        elif not query.Item_status:
-            my_item = (self.session.query(log)
-            .filter(log.AssetId==item_id)
-            .update({'Check_in_date': datetime.now().strftime('%Y-%m-%d %H:%M')}))
+        elif not query.item_status:
+            my_item = (self.session.query(Log)
+            .filter(Log.assetId==item_id)
+            .update({'check_in_date': datetime.now().strftime('%Y-%m-%d %H:%M')}))
 
             (self.session.query(Asset)
-            .filter(Asset.AssetId==item_id)
-            .update({'Item_status': True}))
+            .filter(Asset.assetId==item_id)
+            .update({'item_status': True}))
             self.session.commit()
 
             click.secho("\n\t\t\t Checked In Successfully", fg = 'green', bold = True) 
@@ -99,21 +98,25 @@ class inventory(object):
             click.secho("\n\t\t\t The Item Is Not Checked Out", fg = 'green', bold = True) 
     def item_view(self, item_id):
         rs = (self.session.query(Asset)
-        .filter(Asset.AssetId==item_id).first())
+        .filter(Asset.assetId==item_id).first())
         self.session.commit()
+        
+        if rs is None:
+            return
+        
         logs = []
         for log in rs.logs:
-            logs.append((log.LogId ,log.Check_out_date, log.Check_in_date)) 
+            logs.append((log.logId ,log.check_out_date, log.check_in_date)) 
             
-        return [rs.AssetId, rs.Item_name, rs.Item_description,
-                rs.Item_amount_available, rs.Cost_per_item, 
-                rs.Date_added, rs.Item_status, logs]
+        return [rs.assetId, rs.item_name, rs.item_description,
+                rs.item_amount_available, rs.cost_per_item, 
+                rs.date_added, rs.item_status, logs]
         
     def assetvalue(self):
         total_value = 0
-        rs = self.session.query(Asset.Cost_per_item, Asset.Item_amount_available).all()
+        rs = self.session.query(Asset.cost_per_item, Asset.item_amount_available).all()
         for item in rs:
-            total_value= item.Cost_per_item * item.Item_amount_available + total_value
+            total_value= item.cost_per_item * item.item_amount_available + total_value
         return total_value
     
     def item_search(self):
@@ -121,12 +124,32 @@ class inventory(object):
         search_data = raw_input(click.style("\n\t\tEnter Your search request : ", fg = 'yellow'))
         search_pattern = '%{}%'.format(search_data)
         rs = (self.session.query(Asset)
-              .filter(Asset.Item_description.like(search_pattern)).all())
+              .filter(Asset.item_description.like(search_pattern)).all())
         for data in rs:
-            result_list.append([data.AssetId, data.Item_name,
-            data.Item_amount_available, data.Cost_per_item, 
-            data.Date_added, data.Item_status])
+            result_list.append([data.assetId, data.item_name,
+            data.item_amount_available, data.cost_per_item, 
+            data.date_added, data.item_status])
             
         return result_list
     
-    
+    def db_state(self, filename = 'database'):
+        '''
+        Exports the current state of the database
+        '''
+        mydata = []
+        rs = self.session.query(Asset).all()
+        self.session.commit()
+        for item in rs:
+            mydata.append([item.assetId, item.item_name, item.item_description, item.item_amount_available,
+            item.cost_per_item, item.date_added,
+            item.item_status])
+            
+        
+        with open(filename + '.csv', 'w') as f:
+            writer = csv.writer(f)
+            writer.writerow(['id', 'item-name','description', 'amount_available', 'price', 'date_added', 'status'])
+            writer.writerows(mydata)
+        
+        format_string = '\n\t\t\t{}  Successfully Created\n'.format(filename + '.csv')
+        click.secho(format_string, fg = 'green', bold = True, underline = True)
+   

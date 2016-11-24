@@ -13,40 +13,40 @@ Session = sessionmaker(bind=eng)
 class Asset(Base):
     __tablename__ = "Assets"
  
-    AssetId = Column(Integer, primary_key=True)
-    Item_name = Column(String) 
-    Item_description = Column(String)
-    Item_amount_available = Column(Integer)
-    Cost_per_item = Column(Float)
-    Date_added = Column(String)
-    Item_status = Column(Boolean)
+    assetId = Column(Integer, primary_key=True)
+    item_name = Column(String) 
+    item_description = Column(String)
+    item_amount_available = Column(Integer)
+    cost_per_item = Column(Float)
+    date_added = Column(String)
+    item_status = Column(Boolean)
 
-    logs = relationship("log")
+    logs = relationship("Log")
 
-    def __init__(self, Item_name, Item_description, Item_amount_available,
-                 Cost_per_item, Item_date_added, Item_status):
+    def __init__(self, item_name, item_description, item_amount_available,
+                 cost_per_item, item_date_added, item_status):
         
-        self.Item_name = Item_name
-        self.Item_description = Item_description
-        self.Item_amount_available = Item_amount_available
-        self.Cost_per_item = Cost_per_item
-        self.Date_added = Item_date_added
-        self.Item_status = Item_status
+        self.item_name = item_name
+        self.item_description = item_description
+        self.item_amount_available = item_amount_available
+        self.cost_per_item = cost_per_item
+        self.date_added = item_date_added
+        self.item_status = item_status
 
-class log(Base):
-    __tablename__ = "logs"
+class Log(Base):
+    __tablename__ = "Logs"
  
-    LogId = Column(Integer, primary_key=True)
-    Check_out_date = Column(String)   
-    Check_in_date = Column(String)    
-    AssetId = Column(Integer, ForeignKey("Assets.AssetId"))    
+    logId = Column(Integer, primary_key=True)
+    check_out_date = Column(String)   
+    check_in_date = Column(String)    
+    assetId = Column(Integer, ForeignKey("Assets.assetId"))    
                            
     Assets = relationship("Asset")   
 
-    def __init__(self, Check_out_date, Check_in_date, AssetId):
-        self.Check_out_date =  Check_out_date 
-        self.AssetId = AssetId 
-        self.Check_in_date =   Check_in_date
+    def __init__(self, check_out_date, check_in_date, assetId):
+        self.check_out_date =  check_out_date 
+        self.assetId = assetId 
+        self.check_in_date =  check_in_date
             
 Base.metadata.create_all() 
 
