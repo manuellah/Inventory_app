@@ -1,8 +1,10 @@
+import time
 import click, csv
 from tabulate import tabulate
 from pyfiglet import figlet_format
 from cmd import Cmd
 from inventory_app import Inventory
+
 
 app_name = click.style(figlet_format('Inventory', font='big'),fg='red',bold=True)
 inventory = Inventory()
@@ -14,7 +16,7 @@ class Main(Cmd):
     '''
     
     intro = click.style('\t============ WELCOME =============\n', fg = 'red', bold = True)
-    doc_header = click.style('\tMain Commands', fg = 'green', bold = True)
+    doc_header = click.style('\tMain Commands List (More information help <command>)', fg = 'green', bold = True)
     misc_header = click.style('\tMain Commands', fg = 'green', bold = True)
     undoc_header = click.style('\tOther Commands', fg = 'green', bold = True)
     ruler = click.style('-', fg = 'yellow')
@@ -83,6 +85,8 @@ class Main(Cmd):
         correct_syntax: list_all --export <filename>
         '''
         if not args:
+            print '\n'
+            self.progressbar_gen()
             all_data = inventory.item_list() 
             click.secho('\n\t\t\t  List Of All The Assets\n', fg = 'yellow', bold = True, underline = True)
             headers = ['Id', 'Name', 'Quantity', 'Cost Per Item', 'Date added', 'Checked Status']
@@ -92,6 +96,8 @@ class Main(Cmd):
         
         args = args.split()
         if args[0] == '--export':
+            print '\n'
+            self.progressbar_gen()
             all_data = inventory.item_list() 
             click.secho('\n\t\t\t  List Of All The Assets\n', fg = 'yellow', bold = True, underline = True)
             headers = ['Id', 'Name', 'Quantity', 'Cost Per Item', 'Date added', 'Checked Status']
@@ -206,8 +212,9 @@ class Main(Cmd):
         
         else:
             search_data = args
-   
+        
         results = inventory.item_search(search_data)
+        self.progressbar_gen()
         headers = ['Id', 'Name', 'Quantity', 'Cost Per Item', 'Date added', 'Checked Status']
         print '\n\n'
         click.secho(tabulate(results, tablefmt='fancy_grid', headers = headers), fg = 'yellow')
@@ -216,7 +223,9 @@ class Main(Cmd):
         To exit the application
         syntax : quit
         '''
-        print '\n\n'
+        print '\n'
+        self.progressbar_gen()
+        print '\n'
         return True
     
     def do_exit(self, args):
@@ -224,7 +233,9 @@ class Main(Cmd):
         To exit the application
         syntax : exit
         '''
-        print '\n\n'
+        print '\n'
+        self.progressbar_gen()
+        print '\n'
         return True
     
     def do_clear(selff, args):
@@ -268,9 +279,15 @@ class Main(Cmd):
         syntax: config <prompt string>
         '''
         Main.prompt = click.style(args+' >>> ', fg = 'cyan', bold = True)
-        
+    def progressbar_gen(self):
+        char_t = click.style('#', fg='white', bg='red', bold = True)
+        with click.progressbar(range(20000), width = 50,
+                fill_char = char_t) as prog_bar:
+            for i in prog_bar:
+                pass
         
 if __name__ == '__main__':
     click.clear()
+    Main().progressbar_gen()
     print app_name
     Main().cmdloop()

@@ -1,5 +1,5 @@
 #Inventory management application
-This is a command line IMIS(Inventory management application) 
+This is a command line application(Inventory management application) 
 
 ##application's Commands
 
