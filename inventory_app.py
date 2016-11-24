@@ -129,9 +129,8 @@ class Inventory(object):
             total_value= item.cost_per_item * item.item_amount_available + total_value
         return total_value
     
-    def item_search(self):
+    def item_search(self, search_data):
         result_list = []
-        search_data = raw_input(click.style("\n\t\tEnter Your Search Request : ", fg = 'yellow'))
         search_pattern = '%{}%'.format(search_data)
         rs = (self.session.query(Asset)
               .filter(Asset.item_description.like(search_pattern)).all())

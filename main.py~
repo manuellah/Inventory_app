@@ -201,10 +201,11 @@ class Main(Cmd):
         
         else:
             search_data = args
-   
+        
+        
+        
         results = inventory.item_search(search_data)
         headers = ['Id', 'Name', 'Quantity', 'Cost Per Item', 'Date added', 'Checked Status']
-        print '\n\n'
         click.secho(tabulate(results, tablefmt='fancy_grid', headers = headers), fg = 'yellow')
     def do_quit(self, args):
         '''
@@ -238,26 +239,24 @@ class Main(Cmd):
         Inventory Application Commands
         
         '''
-        click.secho("\n\t\tInventory Application's Command", fg = 'blue', bold = True, underline = True)
+        click.secho("Invalid Command", fg = 'red')
         commands = '''
-        \t1. add item : add <item_name> <quantity> <cost_per_item> or add
-        \n\t2. remove item: remove <item_id> or remove
-        \n\t3. view database: list_all --export <filename> or list_all
-        \n\t4. check out item : checkout <number> or checkout
-        \n\t5. check in item : checkin <number> or checkin
-        \n\t6. full item details :view_item <item_id> or view_item
-        \n\t7. computes total worth of our inventory : asset_value
-        \n\t8. Search item :search <search_query> or search
-        \n\t9. configure you prompt: config <prompt string>
-        \n\t10. exit the application : exit or quit
-        \n\t11. clear window/shell: clear
+        add item : add <item_name> <quantity> <cost_per_item> or add
+        Correct syntax : checkout <number> or checkout
+        Correct syntax : checkin <number> or checkin
+        correct_syntax: list_all --export <filename> or list_all
+        correct_syntax: remove <item_id> or remove
+        Correct syntax :view_item <item_id> or view_item
+        Correct syntax : asset_value
+        Correct syntax :search <search_query> or search
+        syntax : quit or exit
+        syntax : clear
+        syntax: config <prompt string>
         '''
-        click.secho(commands, fg = 'yellow', bold = True)
         
     def do_config(self, args):
         '''
         Configure the prompt to suite your taste
-        syntax : clear
         syntax: config <prompt string>
         '''
         Main.prompt = click.style(args+' >>> ', fg = 'cyan', bold = True)
