@@ -8,14 +8,18 @@ Clone the directory: git clone https://github.com/manuellah/bc-12-inventory_app.
 Go to the app directory cd bc-12-inventory_app
 
 Ensure you are running virtual enviroment:
-
+```console
 . venv/bin/activate if on mac or linux
-
+```
+```console
 venv\scripts\activate if on windows
-
+```
+```console
 Install requirements: pip install -r requirements.txt
-
+```
+```console
 Run the app: python main.py
+```
 
 ##application's Commands
 
