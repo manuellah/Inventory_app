@@ -10,7 +10,9 @@ Go to the app directory cd bc-12-inventory_app
 Ensure you are running virtual enviroment:
 
 . venv/bin/activate if on mac or linux
+
 venv\scripts\activate if on windows
+
 Install requirements: pip install -r requirements.txt
 
 Run the app: python main.py
