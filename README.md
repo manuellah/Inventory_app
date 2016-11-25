@@ -1,6 +1,20 @@
 #Inventory management application
 This is a command line application(Inventory management application) 
 
+##Run App
+
+Clone the directory: git clone https://github.com/manuellah/bc-12-inventory_app.git
+
+Go to the app directory cd bc-12-inventory_app
+
+Ensure you are running virtual enviroment:
+
+. venv/bin/activate if on mac or linux
+venv\scripts\activate if on windows
+Install requirements: pip install -r requirements.txt
+
+Run the app: python main.py
+
 ##application's Commands
 
 1. add item : add <item_name> <quantity> <cost_per_item> or add
