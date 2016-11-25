@@ -1,4 +1,4 @@
-from models import  Asset, Log, Session
+from models import  Asset, Log, Session, or_
 from datetime import datetime
 import click, csv
 
@@ -184,7 +184,7 @@ class Inventory(object):
         result_list = []
         search_pattern = '%{}%'.format(search_data)
         rs = (self.session.query(Asset)
-              .filter(Asset.item_description.like(search_pattern)).all())
+              .filter(or_(Asset.item_description.like(search_pattern), Asset.item_name.like(search_pattern))).all())
         for data in rs:
             result_list.append([data.assetId, data.item_name,
             data.item_amount_available, data.cost_per_item, 

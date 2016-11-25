@@ -1,9 +1,10 @@
-from sqlalchemy import create_engine, ForeignKey
+from sqlalchemy import create_engine, ForeignKey, or_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean
 from sqlalchemy.orm import sessionmaker, relationship
 
 
+or_
 eng = create_engine('sqlite:///inventory.db')
 Base = declarative_base()
 Base.metadata.bind = eng 
