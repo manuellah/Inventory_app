@@ -4,8 +4,9 @@ from tabulate import tabulate
 from pyfiglet import figlet_format
 from cmd import Cmd
 from inventory_app import Inventory
+from getpass import getpass
 
-
+passwrd = click.style('\nEnter Application password : ',fg='cyan',bold=True)
 app_name = click.style(figlet_format('Inventory', font='big'),fg='red',bold=True)
 inventory = Inventory()
 
@@ -287,7 +288,13 @@ class Main(Cmd):
                 pass
         
 if __name__ == '__main__':
-    click.clear()
-    Main().progressbar_gen()
-    print app_name
-    Main().cmdloop()
+    paswrd = getpass(passwrd)
+    if paswrd == 'admin':
+        click.clear()
+        Main().progressbar_gen()
+        print app_name
+        Main().cmdloop()
+    else:
+        print '\n'
+        click.secho("\t\tIncorrect password ", fg = 'red', bold = 'True', underline = 'True')
+        print '\n'
