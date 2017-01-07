@@ -23,7 +23,7 @@ Install requirements: pip install -r requirements.txt
 ```
 start app
 ```console
-Run the app: python main.py
+Run the app: python main.py. password is admin, when prompted for password
 ```
 
 ##application's Commands
